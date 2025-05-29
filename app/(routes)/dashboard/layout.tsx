@@ -6,10 +6,10 @@ const layout = ({children }: {
 }) => {
   return (
     <div>
-      <div>
+      <div className='fixed pl-2 md:w-64 hidden md:block'>
         <SideNav/>
       </div>
-      <div>
+      <div className='md:ml-64 bg-green-200'>
       {children}
       </div>
     </div>

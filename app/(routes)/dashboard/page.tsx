@@ -4,7 +4,7 @@ export default function Dashboard(){
 
   return(
     <div>
-      <UserButton/>
+      Dashboard
     </div>
   )
 }
