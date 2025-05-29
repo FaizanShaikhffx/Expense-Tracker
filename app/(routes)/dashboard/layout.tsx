@@ -1,5 +1,6 @@
 import React, {ReactNode} from 'react'
 import SideNav from './_components/SideNav'
+import DashboardHeader from './_components/DashboardHeader'
 
 const layout = ({children }: {
   children: ReactNode
@@ -9,7 +10,8 @@ const layout = ({children }: {
       <div className='fixed pl-2 md:w-64 hidden md:block'>
         <SideNav/>
       </div>
-      <div className='md:ml-64 bg-green-200'>
+      <div className='md:ml-64 '>
+        <DashboardHeader/>
       {children}
       </div>
     </div>
