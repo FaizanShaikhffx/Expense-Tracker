@@ -1,6 +1,6 @@
 "use client";
 import CreateBudget from "./CreateBudget";
-import { eq, getTableColumns, sql } from "drizzle-orm";
+import { eq, getTableColumns, sql, desc } from "drizzle-orm";
 import { db } from "@/utils/dbConfig";
 import { Budgets, Expenses } from "@/utils/schema";
 import { useEffect, useState } from "react";
@@ -41,17 +41,25 @@ export default function BudgetList() {
         Budgets.amount,
         Budgets.icon,
         Budgets.createdBy
-      );
-    setBudgetList(result);
+      )
+      .orderBy(desc(Budgets.id))
+    setBudgetList(result as any);
   };
 
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        <CreateBudget />
-        {budgetList.map((budget) => (
+        <CreateBudget 
+         refreshData={()=> getBudgetList()}
+        />
+        {budgetList?.length > 0 ? budgetList.map((budget) => (
           <BudgetItem key={budget.id} budget={budget} />
-        ))}
+        )) : [1, 2, 3, 4, 5].map((item, index) => (
+          <div key={index} className='w-full mt-5 bg-slate-200 rounded-lg h-[160px] animate-pulse'>
+
+          </div>
+        ))
+        }
       </div>
     </div>
   );

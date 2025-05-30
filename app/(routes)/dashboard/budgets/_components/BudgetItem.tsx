@@ -4,7 +4,7 @@ const BudgetItem = ({budget} : {
   budget: any
 }) => {
   return (
-    <div className="p-5 border rounded-lg hover:shadow-md cursor-pointer">
+    <div className="p-5 mt-5 border rounded-lg hover:shadow-md cursor-pointer">
       <div className='flex gap-2 items-center justify-between '>
       <div className="flex gap-2 items-center ">
         <h2 className='text-2xl p-3 px-4 bg-slate-100 rounded-full '>{budget?.icon}</h2>

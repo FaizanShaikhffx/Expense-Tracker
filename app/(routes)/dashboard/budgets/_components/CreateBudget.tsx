@@ -19,7 +19,9 @@ import { Budgets } from "@/utils/schema";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 
-export default function CreateBudget() {
+export default function CreateBudget({refreshData}: {
+  refreshData: any
+}) {
   const [emojiIcon, setEmojiIcon] = useState("😀");
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
   const [name, setName] = useState("");
@@ -39,6 +41,7 @@ export default function CreateBudget() {
       .returning({ insertedId: Budgets.id });
 
     if (result) {
+      refreshData()
       toast("New Budget Created!");
     }
   }
@@ -46,12 +49,12 @@ export default function CreateBudget() {
   return (
     <div>
       <Dialog>
-        <DialogTrigger>
-          <div className=" mt-7 bg-slate-100 p-10 rounded-md items-center flex flex-col border-2 border-dashed cursor-pointer hover:shadow-md ">
-            <h2 className="text-3xl">+</h2>
-            <h2>Create New Budget</h2>
-          </div>
-        </DialogTrigger>
+        <DialogTrigger asChild>
+  <div className="w-full h-[160px] mt-5 bg-slate-100 rounded-lg flex flex-col justify-center items-center cursor-pointer border-2 border-dashed hover:shadow-md">
+    <h2 className="text-3xl">+</h2>
+    <h2 className="text-sm font-medium mt-2">Create New Budget</h2>
+  </div>
+</DialogTrigger>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create New Budget</DialogTitle>
@@ -71,7 +74,7 @@ export default function CreateBudget() {
               {emojiIcon}
             </Button>
             {openEmojiPicker && (
-              <div className="absolute z-10">
+              <div className="absolute z-20">
                 <EmojiPicker
                   onEmojiClick={(e) => {
                     setEmojiIcon(e.emoji);
