@@ -24,7 +24,15 @@ export default function ExpensesScreen() {
 };
 
 const [budgetInfo, setBudgetInfo] = useState<BudgetInfoType | undefined>();
-const [expensesList, setExpensesList] = useState([]);
+type ExpenseType = {
+  id: number;
+  name: string;
+  amount: number;
+  budgetId: number | null;
+  createdAt: string;
+};
+
+const [expensesList, setExpensesList] = useState<ExpenseType[]>([]);
 
   useEffect(() => {
     user && getBudgetInfo();
@@ -60,10 +68,18 @@ const [expensesList, setExpensesList] = useState([]);
   };
 
   const getExpenseList = async() => {
-    const result = await db.select().from(Expenses)
-    .where(eq(Expenses.budgetId, params.id ))
-    .orderBy(desc(Expenses.id)); 
-    setExpensesList(result); 
+    
+     const budgetId = Number(params.id);
+
+  if (isNaN(budgetId)) return;
+
+    const result = await db
+    .select()
+    .from(Expenses)
+    .where(eq(Expenses.budgetId, budgetId))
+    .orderBy(desc(Expenses.id));
+
+  setExpensesList(result);
     console.log(result)
   }
 

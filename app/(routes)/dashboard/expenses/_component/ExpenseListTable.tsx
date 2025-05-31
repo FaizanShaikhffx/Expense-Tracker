@@ -7,7 +7,13 @@ import { toast } from "sonner";
 
 const ExpenseListTable = ({expenseList, refreshData}: {expenseList: any, refreshData: any}) => {
 
-  const deleteExpense = async (expenses)=>{
+  const deleteExpense = async (expenses: {
+  id: number;
+  name: string;
+  amount: number;
+  budgetId: number | null;
+  createdAt: string;
+})=>{
     const result = await db.delete(Expenses)
     .where(eq(Expenses.id, expenses.id))
     .returning()
@@ -28,7 +34,7 @@ const ExpenseListTable = ({expenseList, refreshData}: {expenseList: any, refresh
         <h2 className='font-bold'>Action</h2>
       </div>
 
-      {expenseList.map((expenses, index)=>(
+      {expenseList.map((expenses: any, index: any)=>(
         <div key={index} className='grid grid-cols-4 bg-slate-50 p-2'>
         <h2>{expenses.name}</h2>
         <h2>{expenses.amount}</h2>
