@@ -30,12 +30,19 @@ export default function CreateBudget({refreshData}: {
   const { user } = useUser();
 
   async function onCreateBudget() {
+    const email = user?.primaryEmailAddress?.emailAddress;
+
+    if (!name || !amount || !email) {
+    toast("Please fill all fields correctly.");
+    return;
+    }
+
     const result = await db
       .insert(Budgets)
       .values({
         name: name,
         amount: amount,
-        createdBy: user?.primaryEmailAddress?.emailAddress,
+        createdBy: email,
         icon: emojiIcon,
       })
       .returning({ insertedId: Budgets.id });

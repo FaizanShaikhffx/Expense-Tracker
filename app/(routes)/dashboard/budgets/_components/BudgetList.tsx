@@ -2,7 +2,7 @@
 import CreateBudget from "./CreateBudget";
 import { eq, getTableColumns, sql, desc } from "drizzle-orm";
 import { db } from "@/utils/dbConfig";
-import { Budgets, Expenses } from "@/utils/schema";
+import { Budgets, Expenses} from "@/utils/schema";
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import BudgetItem from "./BudgetItem";
@@ -16,7 +16,7 @@ export default function BudgetList() {
     createdBy: string;
     totalSpend: number;
     totalItem: number;
-  };
+};
 
   const [budgetList, setBudgetList] = useState<BudgetWithStats[]>([]);
   const { user } = useUser();
@@ -26,7 +26,7 @@ export default function BudgetList() {
   }, [user]);
 
   const getBudgetList = async () => {
-    const result = await db
+      const result = await db
       .select({
         ...getTableColumns(Budgets),
         totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
@@ -48,7 +48,7 @@ export default function BudgetList() {
 
   return (
     <div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className=" items-center grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <CreateBudget 
          refreshData={()=> getBudgetList()}
         />

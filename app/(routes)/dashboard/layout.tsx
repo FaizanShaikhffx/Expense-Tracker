@@ -20,10 +20,14 @@ const layout = ({children }: {
   }, [user])
 
   const checkUserBudgets = async() =>{
+    const email = user?.primaryEmailAddress?.emailAddress;
+
+    if (!email) return;
+
     const result = await db.select()
     .from(Budgets)
-    .where(eq(Budgets.createdBy,user?.primaryEmailAddress?.emailAddress))
-    console.log(result); 
+    .where(eq(Budgets.createdBy, email))
+    
     if(result?.length == 0){
       router.replace('/dashboard/budgets')
     }
