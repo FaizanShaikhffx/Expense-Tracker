@@ -9,7 +9,6 @@ import { Loader } from "lucide-react";
 
 interface AddExpenseProps {
   budgetId: number | string;
-  user?: any;
   refreshData: () => void;
 }
 
