@@ -8,7 +8,7 @@ import Link from 'next/link'
 
 export default function Header() {
 
-  const {user, isSignedIn} = useUser(); 
+  const { isSignedIn} = useUser(); 
 
   return (
     <div className='p-4 flex justify-between items-center border shadow-sm'>

@@ -7,7 +7,7 @@ import { eq, desc } from 'drizzle-orm';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 
-// Define the type for an expense
+
 interface Expense {
   id: number;
   name: string;

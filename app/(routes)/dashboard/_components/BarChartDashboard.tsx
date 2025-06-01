@@ -9,7 +9,13 @@ import {
   ResponsiveContainer
 } from 'recharts'
 
-const BarChartDashboard = ({ budgetList }: { budgetList: any }) => {
+type BudgetItem = {
+  name: string
+  totalSpend: number
+  amount: number
+}
+
+const BarChartDashboard = ({ budgetList }: { budgetList: BudgetItem[] }) => {
   return (
     <div className="w-full border rounded-lg p-9 h-[350px]">
       <h2 className='font-bold pb-3 text-lg'>Activity</h2>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Trash2 } from 'lucide-react';
-import { Budgets, Expenses } from "@/utils/schema";
+import {  Expenses } from "@/utils/schema";
 import { db } from "@/utils/dbConfig";
 import { eq} from "drizzle-orm";
 import { toast } from "sonner";

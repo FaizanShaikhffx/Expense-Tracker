@@ -19,7 +19,8 @@ import { Budgets } from "@/utils/schema";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 
-export default function CreateBudget({ refreshData }: { refreshData: any }) {
+export default function CreateBudget({ refreshData }: { refreshData: () => void }) {
+
   const [emojiIcon, setEmojiIcon] = useState("😀");
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
   const [name, setName] = useState("");
