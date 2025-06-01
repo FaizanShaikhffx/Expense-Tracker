@@ -69,7 +69,7 @@ const AddExpense = ({
         onClick={() => addNewExpense()}
       >
         {loading ? <Loader className="animate-spin" /> : "Add New Expense"}
-        Add New Expense
+        
       </Button>
     </div>
   );

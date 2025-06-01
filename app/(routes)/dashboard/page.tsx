@@ -33,6 +33,11 @@ export default function Dashboard() {
   }, [user]);
 
   const getBudgetList = async () => {
+
+      const email = user?.primaryEmailAddress?.emailAddress;
+
+      if (!email) return;
+
     const result = await db
       .select({
         ...getTableColumns(Budgets),
@@ -41,7 +46,7 @@ export default function Dashboard() {
       })
       .from(Budgets)
       .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-      .where(eq(Budgets.createdBy, user?.primaryEmailAddress?.emailAddress))
+      .where(eq(Budgets.createdBy, email))
       .groupBy(
         Budgets.id,
         Budgets.name,
@@ -56,6 +61,12 @@ export default function Dashboard() {
   };
 
   const getAllExpenses = async() => {
+
+    const email = user?.primaryEmailAddress?.emailAddress;
+
+    if (!email) return;
+
+
     const result = await db.select({
       id: Expenses.id, 
       name: Expenses.name,
@@ -63,9 +74,9 @@ export default function Dashboard() {
       createdAt: Expenses.createdAt
     }).from(Budgets)
     .rightJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-    .where(eq(Budgets.createdBy, user?.primaryEmailAddress.emailAddress))
+    .where(eq(Budgets.createdBy, email))
     .orderBy(desc(Expenses.id)); 
-    setExpensesList(result)
+    setExpensesList(result as any)
     
   }
 

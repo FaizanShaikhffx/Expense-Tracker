@@ -32,7 +32,7 @@ const EditBudget = ({budgetInfo, refreshData}: {budgetInfo: any, refreshData: an
       if(budgetInfo){
         setEmojiIcon(budgetInfo?.icon); 
         setAmount(budgetInfo.amount); 
-        setAmount(budgetInfo.name); 
+        setName(budgetInfo.name); 
       }
     }, [budgetInfo])
 
