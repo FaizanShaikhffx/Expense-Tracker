@@ -45,10 +45,10 @@ const Hero = () => {
       <div>
         <Image
           className='-mt-5 rounded-xl border-2'
-          src={"/dashboard.jpg"}
+          src={"/dashboard2.png"}
           alt="dashboard"
-          width={1000}
-          height={700}
+          width={1100}
+          height={770}
         />
       </div>
     </section>
