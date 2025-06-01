@@ -13,6 +13,7 @@ interface Expense {
   name: string;
   amount: number;
   createdAt: string;
+  budgetId: number | null;
 }
 
 export default function ExpensesPage() {
