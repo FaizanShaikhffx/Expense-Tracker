@@ -1,47 +1,61 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Budgets, Expenses } from "@/utils/schema";
+import { Expenses } from "@/utils/schema";
 import { db } from "@/utils/dbConfig";
 import { toast } from "sonner";
 import moment from "moment";
-import { Loader } from 'lucide-react';
+import { Loader } from "lucide-react";
 
-const AddExpense = ({
-  budgetId,
-  user,
-  refreshData,
-}: {
-  budgetId: any;
-  user: any;
-  refreshData: any;
-}) => {
+interface AddExpenseProps {
+  budgetId: number | string;
+  user?: any;
+  refreshData: () => void;
+}
+
+const AddExpense = ({ budgetId, refreshData }: AddExpenseProps) => {
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function addNewExpense() {
-    setLoading(true);
-    const result = await db
-      .insert(Expenses)
-      .values({
-        name: name,
-        amount: Number(amount),
-        budgetId: budgetId,
-        createdAt: moment().format("DD/MM/YYYY"),
-      })
-      .returning({ insertedId: Budgets.id });
-    console.log(result);
-
-    setAmount("");
-    setName("");
-
-    if (result) {
-      setLoading(false);
-      refreshData();
-      toast("New Expense Added!");
+    if (!name.trim() || !amount.trim() || isNaN(Number(amount))) {
+      toast.error("Please enter a valid name and numeric amount");
+      return;
     }
-    setLoading(false);
+
+    setLoading(true);
+    try {
+      const budgetIdNumber =
+        typeof budgetId === "string" ? Number(budgetId) : budgetId;
+      if (isNaN(budgetIdNumber)) {
+        toast.error("Invalid budget ID");
+        setLoading(false);
+        return;
+      }
+
+      const result = await db
+        .insert(Expenses)
+        .values({
+          name: name.trim(),
+          amount: Number(amount),
+          budgetId: budgetIdNumber,
+          createdAt: moment().toISOString(), // ISO format preferred for dates
+        })
+        .returning();
+
+      console.log(result);
+
+      setName("");
+      setAmount("");
+      toast.success("New Expense Added!");
+      refreshData();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to add expense");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -66,10 +80,9 @@ const AddExpense = ({
       <Button
         disabled={!(name && amount) || loading}
         className="mt-3 w-full"
-        onClick={() => addNewExpense()}
+        onClick={addNewExpense}
       >
         {loading ? <Loader className="animate-spin" /> : "Add New Expense"}
-        
       </Button>
     </div>
   );

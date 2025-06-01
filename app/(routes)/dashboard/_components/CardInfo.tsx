@@ -1,7 +1,19 @@
 import React, {useEffect, useState} from 'react'
 import {PiggyBank, ReceiptText, Wallet } from 'lucide-react';
 
-const CardInfo = ({budgetList}: {budgetList: any}) => {
+
+type BudgetWithStats = {
+  id: number;
+  name: string;
+  amount: number;
+  icon: string;
+  createdBy: string;
+  totalSpend: number;
+  totalItem: number;
+};
+
+const CardInfo = ({ budgetList }: { budgetList: BudgetWithStats[] }) => {
+
 
   const [totalBudget, setTotalBudget] = useState(0); 
   const [totalSpend, setTotalSpend] = useState(0); 

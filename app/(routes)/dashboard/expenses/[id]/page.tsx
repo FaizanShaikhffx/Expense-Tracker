@@ -1,6 +1,6 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { eq, getTableColumns, sql, desc, and } from "drizzle-orm";
 import { Budgets, Expenses } from "@/utils/schema";
 import { db } from "@/utils/dbConfig";
@@ -52,52 +52,60 @@ export default function ExpensesScreen() {
 
   const [expensesList, setExpensesList] = useState<ExpenseType[]>([]);
 
-  useEffect(() => {
-    user && getBudgetInfo();
-  }, [user]);
+ useEffect(() => {
+  if (user) {
+    getBudgetInfo();
+  }
+}, [user]); 
 
-  const getBudgetInfo = async () => {
-    const email = user?.primaryEmailAddress?.emailAddress;
-    const budgetId = params.id as string;
 
-    if (!email || !budgetId) return;
+  const getBudgetInfo = useCallback(async () => {
+  const email = user?.primaryEmailAddress?.emailAddress;
+  const budgetId = params.id as string;
 
-    const result = await db
-      .select({
-        ...getTableColumns(Budgets),
-        totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
-        totalItem: sql`count(${Expenses.id})`.mapWith(Number),
-      })
-      .from(Budgets)
-      .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-      .where(
-        and(eq(Budgets.createdBy, email), eq(Budgets.id, Number(budgetId)))
-      )
-      .groupBy(
-        Budgets.id,
-        Budgets.name,
-        Budgets.amount,
-        Budgets.icon,
-        Budgets.createdBy
-      );
-    setBudgetInfo(result[0]);
-    getExpenseList();
-  };
+  if (!email || !budgetId) return;
 
-  const getExpenseList = async () => {
-    const budgetId = Number(params.id);
+  const result = await db
+    .select({
+      ...getTableColumns(Budgets),
+      totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
+      totalItem: sql`count(${Expenses.id})`.mapWith(Number),
+    })
+    .from(Budgets)
+    .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
+    .where(and(eq(Budgets.createdBy, email), eq(Budgets.id, Number(budgetId))))
+    .groupBy(
+      Budgets.id,
+      Budgets.name,
+      Budgets.amount,
+      Budgets.icon,
+      Budgets.createdBy
+    );
 
-    if (isNaN(budgetId)) return;
+  setBudgetInfo(result[0]);
+  getExpenseList(); // Optional: convert this to useCallback too
+}, [user, params.id]);
 
-    const result = await db
-      .select()
-      .from(Expenses)
-      .where(eq(Expenses.budgetId, budgetId))
-      .orderBy(desc(Expenses.id));
+useEffect(() => {
+  if (user) {
+    getBudgetInfo();
+  }
+}, [user, getBudgetInfo]);
 
-    setExpensesList(result);
-    console.log(result);
-  };
+
+  const getExpenseList = useCallback(async () => {
+  const budgetId = Number(params.id);
+  if (isNaN(budgetId)) return;
+
+  const result = await db
+    .select()
+    .from(Expenses)
+    .where(eq(Expenses.budgetId, budgetId))
+    .orderBy(desc(Expenses.id));
+
+  setExpensesList(result);
+}, [params.id]);
+
 
   const deleteBudget = async () => {
     const deleteExpenseResult = await db
@@ -106,7 +114,8 @@ export default function ExpensesScreen() {
       .returning();
 
     if (deleteExpenseResult) {
-      const result = await db
+
+      await db
         .delete(Budgets)
         .where(eq(Budgets.id, Number(params.id)))
         .returning();
