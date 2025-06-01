@@ -26,6 +26,9 @@ export default function BudgetList() {
   }, [user]);
 
   const getBudgetList = async () => {
+
+    
+
       const result = await db
       .select({
         ...getTableColumns(Budgets),

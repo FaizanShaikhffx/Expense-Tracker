@@ -24,8 +24,8 @@ const EditBudget = ({budgetInfo, refreshData}: {budgetInfo: any, refreshData: an
 
     const [emojiIcon, setEmojiIcon] = useState(budgetInfo?.icon);
     const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
-    const [name, setName] = useState();
-    const [amount, setAmount] = useState();
+    const [name, setName] = useState<string>('');
+    const [amount, setAmount] = useState<number | undefined>();
     const { user } = useUser();
 
      useEffect(()=>{
