@@ -29,19 +29,17 @@ export default function ExpensesScreen() {
   const route = useRouter();
   const { user } = useUser();
 
- 
-
   type BudgetInfoType = {
     totalSpend: number;
     totalItem: number;
     id: number;
     name: string;
     amount: number;
-    icon: string | null;
+    icon: string;
     createdBy: string;
   };
 
-  const [budgetInfo, setBudgetInfo] = useState<BudgetInfoType | undefined>();
+  const [budgetInfo, setBudgetInfo] = useState<BudgetInfoType | null>(null);
   type ExpenseType = {
     id: number;
     name: string;
@@ -52,72 +50,64 @@ export default function ExpensesScreen() {
 
   const [expensesList, setExpensesList] = useState<ExpenseType[]>([]);
 
- useEffect(() => {
-  if (user) {
-    getBudgetInfo();
-  }
-}, [user]); 
+  const getExpenseList = useCallback(async () => {
+    const budgetId = Number(params.id);
+    if (isNaN(budgetId)) return;
 
+    const result = await db
+      .select()
+      .from(Expenses)
+      .where(eq(Expenses.budgetId, budgetId))
+      .orderBy(desc(Expenses.id));
+
+    setExpensesList(result);
+  }, [params.id]);
 
   const getBudgetInfo = useCallback(async () => {
-  const email = user?.primaryEmailAddress?.emailAddress;
-  const budgetId = params.id as string;
+    const email = user?.primaryEmailAddress?.emailAddress;
+    const budgetId = Number(params.id);
 
-  if (!email || !budgetId) return;
+    if (!email || isNaN(budgetId)) return;
 
-  const result = await db
-    .select({
-      ...getTableColumns(Budgets),
-      totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
-      totalItem: sql`count(${Expenses.id})`.mapWith(Number),
-    })
-    .from(Budgets)
-    .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-    .where(and(eq(Budgets.createdBy, email), eq(Budgets.id, Number(budgetId))))
-    .groupBy(
-      Budgets.id,
-      Budgets.name,
-      Budgets.amount,
-      Budgets.icon,
-      Budgets.createdBy
-    );
+    const result = await db
+      .select({
+        ...getTableColumns(Budgets),
+        totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
+        totalItem: sql`count(${Expenses.id})`.mapWith(Number),
+      })
+      .from(Budgets)
+      .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
+      .where(and(eq(Budgets.createdBy, email), eq(Budgets.id, budgetId)))
+      .groupBy(
+        Budgets.id,
+        Budgets.name,
+        Budgets.amount,
+        Budgets.icon,
+        Budgets.createdBy
+      );
 
-  setBudgetInfo(result[0]);
-  getExpenseList(); // Optional: convert this to useCallback too
-}, [user, params.id]);
+    setBudgetInfo(result[0] ? { ...result[0], icon: result[0].icon ?? '' } : null);
+    getExpenseList();
+  }, [user, params.id, getExpenseList]);
 
-useEffect(() => {
-  if (user) {
-    getBudgetInfo();
-  }
-}, [user, getBudgetInfo]);
-
-
-  const getExpenseList = useCallback(async () => {
-  const budgetId = Number(params.id);
-  if (isNaN(budgetId)) return;
-
-  const result = await db
-    .select()
-    .from(Expenses)
-    .where(eq(Expenses.budgetId, budgetId))
-    .orderBy(desc(Expenses.id));
-
-  setExpensesList(result);
-}, [params.id]);
-
+  useEffect(() => {
+    if (user) {
+      getBudgetInfo();
+    }
+  }, [user, getBudgetInfo]);
 
   const deleteBudget = async () => {
+    const budgetId = Number(params.id);
+    if (isNaN(budgetId)) return;
     const deleteExpenseResult = await db
       .delete(Expenses)
-      .where(eq(Expenses.budgetId, params.id))
+      .where(eq(Expenses.budgetId, budgetId))
       .returning();
 
     if (deleteExpenseResult) {
-
       await db
         .delete(Budgets)
-        .where(eq(Budgets.id, Number(params.id)))
+        .where(eq(Budgets.id, budgetId))
         .returning();
     }
     toast("Budget Deleted !");
@@ -158,13 +148,12 @@ useEffect(() => {
       </h2>
       <div className="grid grid-cols-1  md:grid-cols-2 gap-5 ">
         {budgetInfo ? (
-          <BudgetItem budget={budgetInfo} />
+          <BudgetItem budget={{ ...budgetInfo, icon: budgetInfo.icon ?? '' }} />
         ) : (
           <div className="h-[150px] w-full bg-slate-200 rounded-lg animate-pulse"></div>
         )}
         <AddExpense
-          budgetId={params.id}
-          user={user}
+          budgetId={params.id as string}
           refreshData={() => getBudgetInfo()}
         />
       </div>

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useCallback} from 'react'
 import {PiggyBank, ReceiptText, Wallet } from 'lucide-react';
 
 
@@ -18,11 +18,7 @@ const CardInfo = ({ budgetList }: { budgetList: BudgetWithStats[] }) => {
   const [totalBudget, setTotalBudget] = useState(0); 
   const [totalSpend, setTotalSpend] = useState(0); 
 
-  useEffect(()=>{
-    calculateCardInfo(); 
-  }, [budgetList])
-
-  const calculateCardInfo = () =>{
+  const calculateCardInfo = useCallback(() => {
     console.log(budgetList); 
     let totalBudget_ = 0; 
     let totalSpend_ = 0; 
@@ -36,7 +32,11 @@ const CardInfo = ({ budgetList }: { budgetList: BudgetWithStats[] }) => {
     setTotalSpend(totalSpend_)
     console.log(totalBudget_, totalSpend_); 
 
-}
+}, [budgetList]);
+
+  useEffect(()=>{
+    calculateCardInfo(); 
+  }, [budgetList, calculateCardInfo])
 
   return (
      <div>    
